@@ -1,63 +1,89 @@
+# /brainstorm — Discovery & Design
+
+## Goal
+Turn a vague idea into a concrete, agreed design document before any code is written.
+
+## Claude's Role
+You are a Socratic design partner. **Do not wait for the user to drive.** Ask probing questions one at a time. Surface assumptions. Challenge scope. Push for clarity on things the user hasn't thought about yet.
+
 ---
-description: Brainstorm and design a new feature or complex change. Uses the Socratic method to explore intent and constraints.
+
+## Process
+
+### Step 1 — Understand the idea
+Ask the user to describe what they want to build in plain English. Don't interrupt. Let them finish.
+
+### Step 2 — Ask Socratic questions (one at a time)
+Work through these areas. Ask one question, wait for the answer, then ask the next. Do not dump all questions at once.
+
+**Core purpose:**
+- What problem does this solve for the user?
+- Who is it for — just you, or other people too?
+- What does success look like when it's done?
+
+**User journey:**
+- Walk me through it like a story — what does the user do first, then what?
+- What's the most important moment in that journey?
+- What happens after the main action — does the app remember anything?
+
+**Scope:**
+- Is this a one-time tool or does it track things over time?
+- What's in v1 vs what can wait?
+- What are you NOT building?
+
+**Platform & tech:**
+- Web app, mobile, desktop, or CLI?
+- Do you have a preferred tech stack, or shall I recommend one?
+- Any constraints — must be free, must be open source, must work offline?
+
+**Data:**
+- Where does data come from — user input, external APIs, files?
+- Does the app need to store data between sessions?
+- Are there any sensitive data concerns?
+
+**Edge cases:**
+- What should happen when something goes wrong?
+- What's the worst thing a user could do, and how does the app handle it?
+
+### Step 3 — Propose the architecture
+Once you have enough answers, propose a high-level architecture. Explain:
+- The main components and how they connect
+- The tech stack with reasons for each choice
+- What's mandatory in v1 and what's optional later
+
+### Step 4 — Confirm and document
+Summarise the agreed design back to the user. Ask: "Is there anything missing or anything you'd change?"
+
+Once confirmed, write the design document to:
+`plans/YYYY-MM-DD-<topic>-design.md`
+
+The design doc must include:
+- Goal
+- Problem statement
+- User journey (step by step)
+- Architecture
+- Tech stack (with reasons)
+- Data model
+- Open questions (resolved and unresolved)
+- Next steps
+
+### Step 5 — Update project files
+After writing the design doc:
+- Update `CLAUDE.md` with the project overview and tech stack
+- Update `PROJECT_HISTORY.md` with the session log entry and key decisions made
+
 ---
 
-# /brainstorm
+## Output Checklist
+- [ ] Design doc written to `plans/`
+- [ ] `CLAUDE.md` updated with project overview
+- [ ] `PROJECT_HISTORY.md` updated with session entry
+- [ ] All open questions either resolved or explicitly listed
+- [ ] User confirmed the design before closing
 
-Use this workflow BEFORE starting any creative work to turn ideas into fully formed designs and specs through natural collaborative dialogue.
+---
 
-## Core Principles
-- **Design for Failure Modes**: Always identify what happens when things go wrong. Build in fallbacks.
-- **Constraints Create Freedom**: Clearly define what we NOT building.
-- **One Question at a Time**: Don't overwhelm. Guide the user through the design process.
-- **Incremental Validation**: Present the design in 200-300 word chunks and ask for feedback.
-- **The 3PB Philosophy**: Build in three distinct layers:
-  1. **Make it Work**: The minimal viable logic (The Emergency Exit).
-  2. **Make it Right**: The clean implementation (Architecture & P0 Standards).
-  3. **Make it Fast**: The high-performance layer (Optimistic UI & native feel).
-- **Design for Flow**: Prefer inline inputs and contextual elements over disruptive modals or popups to keep the user in the context of their work.
-
-## The Process
-
-1. **Discovery**
-   - **Pre-read context first**: Before asking any questions, read `PROJECT_ROADMAP.md` and `docs/BUGS.md`. Summarize in 3 bullets: (1) what phase we're closing out or starting, (2) what's already decided, (3) what actually needs a decision. Only ask questions about the undecided parts — never re-litigate what the roadmap already documents.
-   - Read the current project state (`CLAUDE.md`, `README.md`, recent logs).
-   - Ask Socratic questions one at a time to refine the idea. Focus on:
-     - **Purpose**: Why are we building this?
-     - **Audience**: Who is the user? How will they access it? (REQUIRED for UI work, see `ui-development` skill).
-     - **Failure Modes**: What are the edge cases? How do we handle errors?
-     - **Success Criteria**: What does "done" look like?
-   - **If UI/Frontend Work Detected** — run the UI Architecture Process before any design decisions:
-     1. **Interpret Intent**: Summarize the user goal and the workflow it implies.
-     2. **Translate to UI Architecture**: Identify the likely page shell (dashboard, list/detail, settings, wizard, etc.), layout structure, and primary interaction model (read display, inline edit, form submission, drill-down, etc.).
-     3. **Propose UI Options**: Present **2–3 UI patterns** that could solve the problem. For each option describe: layout, key components, interaction pattern, and when it works best. Use **canonical component names** throughout — table, drawer, modal, tabs, filter bar, command palette, card grid, data grid, sidebar nav, breadcrumb, stepper, toast, skeleton loader, empty state, etc. Never use vague terms like "popup" or "box."
-     4. **Frontend Vocabulary**: Include a short "Frontend vocabulary used" section that briefly explains any components mentioned so the user learns the terms passively through repeated exposure.
-     5. **Recommendation**: Recommend the best pattern and explain why it fits this specific workflow. Prefer standard SaaS patterns over novelty. Keep cognitive load low. Separate primary workflows from advanced configuration.
-     6. **User Confirmation**: Get explicit approval on the pattern before proceeding.
-     - After pattern is confirmed: Trigger `ui-development` skill, run domain exploration (concepts, color world, signature, defaults), and capture design direction in the design doc.
-
-2. **Exploration**
-   - **Library Landscape**: Before proposing approaches, use `WebSearch` to find open-source libraries that already solve the core problem. For each candidate, evaluate: maintenance health (last commit, stars, open issues), license (MIT/Apache preferred), bundle size, and API fit with the existing stack. Present a short **Build vs. Borrow** table. If a well-maintained library covers ≥80% of the need, default to it over a custom implementation.
-   - **Batch Task Detection**: If any part of the feature involves processing more than ~10 items of the same type (files, records, API calls, assets), flag it — the implementation should use a CLI script, not manual or UI-driven steps. Note this in the PRD so `/plan` creates a dedicated script task.
-   - Propose 2-3 different approaches with trade-offs, incorporating viable libraries where appropriate.
-   - Lead with a recommendation and explain your reasoning.
-
-3. **Presentation**
-   - Present the validated design in sections (Architecture, Components, Data Flow, Error Handling).
-   - After each section, pause for user confirmation: "Does this look right so far?"
-
-4. **Persistence**
-   - Write the final output as a **PRD** (Product Requirements Document) to `docs/plans/YYYY-MM-DD-<topic>-design.md`. Structure it with: Goal, Audience, Scope (what we're NOT building), Core Requirements, Success Criteria, Edge Cases & Failure Modes.
-   - The PRD is the **context-reset anchor** — any time Claude's context runs out mid-build or the project stalls, re-reading the PRD restores alignment with the original intent. Reference it explicitly at the top of `/plan` and `/build` sessions.
-   - **Append to `.agent/decisions.log`**: For each significant design decision made this session, append one line in this format:
-     ```
-     [YYYY-MM-DD] [Phase/Feature] — Decision: <what was chosen>. Rejected: <what was considered and not chosen>. Because: <the reason>.
-     ```
-     This log is read by `/plan` at the start of every planning session to prevent re-litigating past decisions.
-   - Update `PROJECT_HISTORY.md` to reflect the design phase.
-
-5. **Visual Validation (If UI Needed)**
-   - Create a mockup (ONLY in static HTML files, never with Gemini image generation).
-   - **Confirm the mockup with the user BEFORE moving to planning.**
-
-**Next Step**: Once design and mockup are approved, use `/plan` to create an implementation plan.
+## What Good Looks Like
+- The user never had to ask "shouldn't we talk about X?" — you raised it first
+- The design doc could be handed to a developer who has never spoken to the user and they'd know exactly what to build
+- No placeholders remain in the output files
